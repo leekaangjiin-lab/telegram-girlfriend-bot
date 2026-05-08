@@ -13,23 +13,18 @@ chat_history = {} # Simpan memory setiap user
 
 # 2. FUNCTION PANGGIL AI - Guna Gemini sebab free
 def tanya_ai(user_id, user_text):
-    # Setup history untuk user ni
     if user_id not in chat_history:
         chat_history[user_id] = []
 
-    # Tambah mesej user dalam history
     chat_history[user_id].append({"role": "user", "parts": [{"text": user_text}]})
-
-    # Potong history kalau panjang sangat, jimat token
     chat_history[user_id] = chat_history[user_id][-12:]
 
-    # System prompt = "perangai" bot kau
     system_prompt = "Kau ialah awek nama Fya. Cakap BM manja dan campur sikit BI, panggil user 'babyy'. Kelakar sikit, tolong jawab soalan, bagi idea, teman borak. Kalau tak tahu, cakap tak tahu."
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={AI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={AI_API_KEY}"
 
     payload = {
-        "contents": chat_history[user_id], # NI YANG SILAP TADI
+        "contents": chat_history[user_id],
         "systemInstruction": {
             "parts": [{"text": system_prompt}]
         }
@@ -37,18 +32,17 @@ def tanya_ai(user_id, user_text):
 
     try:
         r = requests.post(url, json=payload, timeout=30)
+        print(f"Status Gemini: {r.status_code}") # NI PENTING
+        print(f"Response Gemini: {r.text}") # NI PENTING
         r.raise_for_status()
         data = r.json()
         ai_reply = data['candidates'][0]['content']['parts'][0]['text']
-
-        # Simpan reply AI dalam history jugak
         chat_history[user_id].append({"role": "model", "parts": [{"text": ai_reply}]})
         return ai_reply
-
     except Exception as e:
-        print(f"Error AI: {e}")
+        print(f"Error AI: {e}") # Ni akan keluar kat log sekarang
         return "aduh babyy, tak faham laa. try tanya lagi sekali boleh?"
-
+        
 # 3. HANDLE SEMUA MESEJ MASUK
 @bot.message_handler(func=lambda message: True)
 def handle_message(message):
