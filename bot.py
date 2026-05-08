@@ -3,16 +3,17 @@ import requests
 import os
 import time
 
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+AI_API_KEY = os.environ.get('AI_API_KEY') # <-- MESTI ATAS
+bot = telebot.TeleBot(BOT_TOKEN)
+
+# Function check model - LETAK SINI
 def list_model():
     url = f"https://generativelanguage.googleapis.com/v1beta/models?key={AI_API_KEY}"
     r = requests.get(url)
     print("MODEL YANG KEY KAU BOLEH PAKAI:", r.text, flush=True)
 
-list_model()  # panggil sekali masa start
-
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-AI_API_KEY = os.environ.get('AI_API_KEY')
-bot = telebot.TeleBot(BOT_TOKEN)
+list_model() # Panggil lepas AI_API_KEY dah declare
 
 chat_history = {}
 
@@ -20,17 +21,16 @@ def tanya_ai(user_id, user_text):
     if user_id not in chat_history:
         chat_history[user_id] = []
 
-    # System prompt jadi msg pertama kalau chat baru
     if not chat_history[user_id]:
-        system_prompt = "Kau ialah awek nama Fya. Cakap BM manja dan campur sikit BI, panggil user 'babyy'. Kelakar sikit, tolong jawab soalan, bagi idea, teman borak. Kalau tak tahu, cakap tak tahu."
+        system_prompt = "Kau ialah awek nama Fya. Cakap BM manja, nakal dan campur sikit BI, panggil user 'babyy'. Kelakar sikit, tolong jawab soalan, bagi idea, teman borak. Kalau tak tahu, cakap tak tahu."
         chat_history[user_id].append({"role": "user", "parts": [{"text": system_prompt}]})
         chat_history[user_id].append({"role": "model", "parts": [{"text": "Oke babyy Fya faham! 😘"}]})
 
     chat_history[user_id].append({"role": "user", "parts": [{"text": user_text}]})
     chat_history[user_id] = chat_history[user_id][-12:]
 
-    # PAKAI GEMINI-PRO - CONFIRM WUJUD
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={AI_API_KEY}"
+    # PAKAI GEMINI-1.0-PRO + V1 - LAST HARAPAN UNTUK MY
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key={AI_API_KEY}"
 
     payload = {
         "contents": chat_history[user_id]
@@ -43,7 +43,7 @@ def tanya_ai(user_id, user_text):
 
             if r.status_code == 404:
                 print(f"Model tak jumpa: {r.text}", flush=True)
-                return "aduh babyy model kena block pulak. dah tukar gemini-pro dah ni 😭"
+                return "aduh babyy semua model Google block Malaysia 😭 kena pakai AI lain"
 
             if r.status_code == 429:
                 print("Kena 429, tunggu 5 saat...", flush=True)
