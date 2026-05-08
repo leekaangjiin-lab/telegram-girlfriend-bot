@@ -43,10 +43,16 @@ def tanya_ai(user_id, user_text):
 
 @bot.message_handler(func=lambda message: True)
 def balas_chat(message):
+    print(f"Dapat msg dari {message.from_user.id}: {message.text}") # LOG 1
     user_id = message.from_user.id
     user_text = message.text
     ai_reply = tanya_ai(user_id, user_text)
-    bot.reply_to(message, ai_reply)
+    print(f"AI nak reply: {ai_reply}") # LOG 2
+    try:
+        bot.reply_to(message, ai_reply)
+        print("Dah hantar kat Telegram") # LOG 3
+    except Exception as e:
+        print(f"Error hantar msg: {e}") # LOG 4
 
 @app.route('/' + BOT_TOKEN, methods=['POST'])
 def getMessage():
