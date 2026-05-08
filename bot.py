@@ -27,17 +27,29 @@ def tanya_ai(user_id, user_text):
         }
     }
 
-    try:
-        r = requests.post(url, json=payload, timeout=30)
-        print(f"Status Gemini: {r.status_code}", flush=True)
-        r.raise_for_status()
-        data = r.json()
-        ai_reply = data['candidates'][0]['content']['parts'][0]['text']
-        chat_history[user_id].append({"role": "model", "parts": [{"text": ai_reply}]})
-        return ai_reply
-    except Exception as e:
-        print(f"Error AI: {e}", flush=True)
-        return "aduh babyy server Fya merajuk jap. try lagi boleh? 😭"
+    for attempt in range(3): # Try 3 kali
+        try:
+            r = requests.post(url, json=payload, timeout=30)
+            print(f"Status Gemini: {r.status_code}", flush=True)
+
+            if r.status_code == 429: # Kalau kena rate limit
+                print("Kena 429, tunggu 5 saat...", flush=True)
+                time.sleep(5)
+                continue
+
+            r.raise_for_status()
+            data = r.json()
+            ai_reply = data['candidates'][0]['content']['parts'][0]['text']
+            chat_history[user_id].append({"role": "model", "parts": [{"text": ai_reply}]})
+            return ai_reply
+
+        except Exception as e:
+            print(f"Error AI: {e}", flush=True)
+            if attempt == 2: # Last attempt
+                return "aduh babyy Fya penat jap. bagi Fya nap 5 saat pastu chat balik eh? 😭"
+            time.sleep(2)
+
+    return "aduh babyy server Fya merajuk jap. try lagi boleh? 😭"
 
 @bot.message_handler(func=lambda message: True)
 def balas_chat(message):
