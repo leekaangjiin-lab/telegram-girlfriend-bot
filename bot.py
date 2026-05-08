@@ -30,29 +30,29 @@ def tanya_ai(user_id, user_text):
 
     try:
         r = requests.post(url, json=payload, timeout=30)
-        print(f"Status Gemini: {r.status_code}") , flush=True)
-        print(f"Response Gemini: {r.text}")
+        print(f"Status Gemini: {r.status_code}", flush=True)
+        print(f"Response Gemini: {r.text}", flush=True)
         r.raise_for_status()
         data = r.json()
         ai_reply = data['candidates'][0]['content']['parts'][0]['text']
         chat_history[user_id].append({"role": "model", "parts": [{"text": ai_reply}]})
         return ai_reply
     except Exception as e:
-        print(f"Error AI: {e}")
+        print(f"Error AI: {e}", flush=True)
         return "aduh babyy server Fya merajuk jap. try lagi boleh? 😭"
 
 @bot.message_handler(func=lambda message: True)
 def balas_chat(message):
-    print(f"Dapat msg dari {message.from_user.id}: {message.text}") , flush=True) # LOG 1
+    print(f"Dapat msg dari {message.from_user.id}: {message.text}", flush=True)
     user_id = message.from_user.id
     user_text = message.text
     ai_reply = tanya_ai(user_id, user_text)
-    print(f"AI nak reply: {ai_reply}") , flush=True) # LOG 2
+    print(f"AI nak reply: {ai_reply}", flush=True)
     try:
         bot.reply_to(message, ai_reply)
-        print("Dah hantar kat Telegram") # LOG 3
+        print("Dah hantar kat Telegram", flush=True)
     except Exception as e:
-        print(f"Error hantar msg: {e}") , flush=True) # LOG 4
+        print(f"Error hantar msg: {e}", flush=True)
 
 @app.route('/' + BOT_TOKEN, methods=['POST'])
 def getMessage():
