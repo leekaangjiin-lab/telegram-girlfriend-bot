@@ -27,12 +27,12 @@ def tanya_ai(user_id, user_text):
         }
     }
 
-    for attempt in range(3): # Try 3 kali
+    for attempt in range(3):
         try:
             r = requests.post(url, json=payload, timeout=30)
             print(f"Status Gemini: {r.status_code}", flush=True)
 
-            if r.status_code == 429: # Kalau kena rate limit
+            if r.status_code == 429:
                 print("Kena 429, tunggu 5 saat...", flush=True)
                 time.sleep(5)
                 continue
@@ -45,7 +45,7 @@ def tanya_ai(user_id, user_text):
 
         except Exception as e:
             print(f"Error AI: {e}", flush=True)
-            if attempt == 2: # Last attempt
+            if attempt == 2:
                 return "aduh babyy Fya penat jap. bagi Fya nap 5 saat pastu chat balik eh? 😭"
             time.sleep(2)
 
@@ -67,12 +67,5 @@ def balas_chat(message):
 if __name__ == "__main__":
     print("Fya tengah bangun... padam webhook lama dulu", flush=True)
     bot.remove_webhook()
-    time.sleep(1)
-    print("Fya dah online babyy! Polling start...", flush=True)
-    if __name__ == "__main__":
-    print("Fya tengah bangun... padam webhook lama dulu", flush=True)
-    bot.remove_webhook()
-    time.sleep(3)  # Bagi masa Telegram clear session
-    print("Fya dah online babyy! Polling start...", flush=True)
-    bot.infinity_polling(skip_pending=True, timeout=60, long_polling_timeout=60)
-    bot.infinity_polling(timeout=60, long_polling_timeout=60)
+    time.sleep(3)
+    print("Fya dah online
