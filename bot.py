@@ -13,24 +13,29 @@ def tanya_ai(user_id, user_text):
     if user_id not in chat_history:
         chat_history[user_id] = []
 
-    chat_history[user_id].append({"role": "user", "parts": [{"text": user_text}]})
-    chat_history[user_id] = chat_history[user_id][-12:]
+    # System prompt jadi msg pertama kalau chat baru
+    if not chat_history[user_id]:
+        system_prompt = "Kau ialah awek nama Fya. Cakap BM manja dan campur sikit BI, panggil user 'babyy'. Kelakar sikit, tolong jawab soalan, bagi idea, teman borak. Kalau tak tahu, cakap tak tahu."
+        chat_history[user_id].append({"role": "user", "parts": [{"text": system_prompt}]})
+        chat_history[user_id].append({"role": "model", "parts": [{"text": "Oke babyy Fya faham! 😘"}]})
 
-    system_prompt = "Kau ialah awek nama Fya. Cakap BM manja dan campur sikit BI, panggil user 'babyy'. Kelakar sikit, tolong jawab soalan, bagi idea, teman borak. Kalau tak tahu, cakap tak tahu."
+    chat_history[user_id].append({"role": "user", "parts": [{"text": user_text}]})
+    chat_history[user_id] = chat_history[user_id][-12:] # Simpan 12 msg terakhir
 
     url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={AI_API_KEY}"
 
+    # v1 takde systemInstruction, buang terus
     payload = {
-        "contents": chat_history[user_id],
-        "systemInstruction": {
-            "parts": [{"text": system_prompt}]
-        }
+        "contents": chat_history[user_id]
     }
 
     for attempt in range(3):
         try:
             r = requests.post(url, json=payload, timeout=30)
             print(f"Status Gemini: {r.status_code}", flush=True)
+
+            if r.status_code == 400:
+                print(f"Bad request: {r.text}", flush=True)
 
             if r.status_code == 429:
                 print("Kena 429, tunggu 5 saat...", flush=True)
@@ -46,7 +51,7 @@ def tanya_ai(user_id, user_text):
         except Exception as e:
             print(f"Error AI: {e}", flush=True)
             if attempt == 2:
-                return "aduh babyy Fya penat jap. bagi Fya nap 5 saat pastu chat balik eh? 😭"
+                return "aduh babyy Fya pening jap. format request salah. jap fix 😭"
             time.sleep(2)
 
     return "aduh babyy server Fya merajuk jap. try lagi boleh? 😭"
