@@ -68,4 +68,5 @@ if __name__ == "__main__":
     print("Fya tengah bangun... padam webhook lama dulu", flush=True)
     bot.remove_webhook()
     time.sleep(3)
-    print("Fya dah online
+    print("Fya dah online babyy! Polling start...", flush=True)
+    bot.infinity_polling(skip_pending=True, timeout=60, long_polling_timeout=60)
