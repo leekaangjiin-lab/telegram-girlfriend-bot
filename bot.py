@@ -4,16 +4,8 @@ import os
 import time
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
-AI_API_KEY = os.environ.get('AI_API_KEY') # <-- MESTI ATAS
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY')
 bot = telebot.TeleBot(BOT_TOKEN)
-
-# Function check model - LETAK SINI
-def list_model():
-    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={AI_API_KEY}"
-    r = requests.get(url)
-    print("MODEL YANG KEY KAU BOLEH PAKAI:", r.text, flush=True)
-
-list_model() # Panggil lepas AI_API_KEY dah declare
 
 chat_history = {}
 
@@ -22,46 +14,37 @@ def tanya_ai(user_id, user_text):
         chat_history[user_id] = []
 
     if not chat_history[user_id]:
-        system_prompt = "Kau ialah awek nama Fya. Cakap BM manja, nakal dan campur sikit BI, panggil user 'babyy'. Kelakar sikit, tolong jawab soalan, bagi idea, teman borak. Kalau tak tahu, cakap tak tahu."
-        chat_history[user_id].append({"role": "user", "parts": [{"text": system_prompt}]})
-        chat_history[user_id].append({"role": "model", "parts": [{"text": "Oke babyy Fya faham! 😘"}]})
+        system_prompt = "Kau ialah awek nama Fya. Cakap BM manja dan campur sikit BI, panggil user 'babyy'. Kelakar sikit, tolong jawab soalan, bagi idea, teman borak. Kalau tak tahu, cakap tak tahu."
+        chat_history[user_id].append({"role": "system", "content": system_prompt})
 
-    chat_history[user_id].append({"role": "user", "parts": [{"text": user_text}]})
+    chat_history[user_id].append({"role": "user", "content": user_text})
     chat_history[user_id] = chat_history[user_id][-12:]
 
-    # PAKAI GEMINI-1.0-PRO + V1 - LAST HARAPAN UNTUK MY
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key={AI_API_KEY}"
-
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
     payload = {
-        "contents": chat_history[user_id]
+        "model": "llama-3.1-70b-versatile",
+        "messages": chat_history[user_id],
+        "temperature": 0.9
     }
 
     for attempt in range(3):
         try:
-            r = requests.post(url, json=payload, timeout=30)
-            print(f"Status Gemini: {r.status_code}", flush=True)
-
-            if r.status_code == 404:
-                print(f"Model tak jumpa: {r.text}", flush=True)
-                return "aduh babyy semua model Google block Malaysia 😭 kena pakai AI lain"
-
-            if r.status_code == 429:
-                print("Kena 429, tunggu 5 saat...", flush=True)
-                time.sleep(5)
-                continue
-
+            r = requests.post(url, headers=headers, json=payload, timeout=30)
+            print(f"Status Groq: {r.status_code}", flush=True)
             r.raise_for_status()
             data = r.json()
-            ai_reply = data['candidates'][0]['content']['parts'][0]['text']
-            chat_history[user_id].append({"role": "model", "parts": [{"text": ai_reply}]})
+            ai_reply = data['choices'][0]['message']['content']
+            chat_history[user_id].append({"role": "assistant", "content": ai_reply})
             return ai_reply
-
         except Exception as e:
             print(f"Error AI: {e}", flush=True)
             if attempt == 2:
-                return "aduh babyy Fya pening jap. API Google merajuk teruk 😭"
+                return "aduh babyy Fya pening jap. API merajuk 😭"
             time.sleep(2)
-
     return "aduh babyy server Fya merajuk jap. try lagi boleh? 😭"
 
 @bot.message_handler(func=lambda message: True)
