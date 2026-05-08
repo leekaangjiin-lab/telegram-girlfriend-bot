@@ -30,7 +30,7 @@ def tanya_ai(user_id, user_text):
 
     try:
         r = requests.post(url, json=payload, timeout=30)
-        print(f"Status Gemini: {r.status_code}")
+        print(f"Status Gemini: {r.status_code}") , flush=True)
         print(f"Response Gemini: {r.text}")
         r.raise_for_status()
         data = r.json()
@@ -43,16 +43,16 @@ def tanya_ai(user_id, user_text):
 
 @bot.message_handler(func=lambda message: True)
 def balas_chat(message):
-    print(f"Dapat msg dari {message.from_user.id}: {message.text}") # LOG 1
+    print(f"Dapat msg dari {message.from_user.id}: {message.text}") , flush=True) # LOG 1
     user_id = message.from_user.id
     user_text = message.text
     ai_reply = tanya_ai(user_id, user_text)
-    print(f"AI nak reply: {ai_reply}") # LOG 2
+    print(f"AI nak reply: {ai_reply}") , flush=True) # LOG 2
     try:
         bot.reply_to(message, ai_reply)
         print("Dah hantar kat Telegram") # LOG 3
     except Exception as e:
-        print(f"Error hantar msg: {e}") # LOG 4
+        print(f"Error hantar msg: {e}") , flush=True) # LOG 4
 
 @app.route('/' + BOT_TOKEN, methods=['POST'])
 def getMessage():
