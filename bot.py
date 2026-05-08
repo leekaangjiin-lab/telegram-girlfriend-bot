@@ -1,12 +1,11 @@
 import telebot
 import requests
 import os
-from flask import Flask, request
+import time
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 AI_API_KEY = os.environ.get('AI_API_KEY')
 bot = telebot.TeleBot(BOT_TOKEN)
-app = Flask(__name__)
 
 chat_history = {}
 
@@ -31,7 +30,6 @@ def tanya_ai(user_id, user_text):
     try:
         r = requests.post(url, json=payload, timeout=30)
         print(f"Status Gemini: {r.status_code}", flush=True)
-        print(f"Response Gemini: {r.text}", flush=True)
         r.raise_for_status()
         data = r.json()
         ai_reply = data['candidates'][0]['content']['parts'][0]['text']
@@ -54,17 +52,9 @@ def balas_chat(message):
     except Exception as e:
         print(f"Error hantar msg: {e}", flush=True)
 
-@app.route('/' + BOT_TOKEN, methods=['POST'])
-def getMessage():
-    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
-    return "!", 200
-
-@app.route("/")
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url='https://telegram-girlfriend-bot-38ox.onrender.com/' + BOT_TOKEN)
-    return "Webhook set!", 200
-
 if __name__ == "__main__":
-    print("Bot starting...")
-    app.run(host="0.0.0.0", port=int(os.environ.get('PORT', 8080)))
+    print("Fya tengah bangun... padam webhook lama dulu", flush=True)
+    bot.remove_webhook()
+    time.sleep(1)
+    print("Fya dah online babyy! Polling start...", flush=True)
+    bot.infinity_polling(timeout=60, long_polling_timeout=60)
