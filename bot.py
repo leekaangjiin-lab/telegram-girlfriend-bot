@@ -18,7 +18,7 @@ def tanya_ai(user_id, user_text):
 
     system_prompt = "Kau ialah awek nama Fya. Cakap BM manja dan campur sikit BI, panggil user 'babyy'. Kelakar sikit, tolong jawab soalan, bagi idea, teman borak. Kalau tak tahu, cakap tak tahu."
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={AI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={AI_API_KEY}"
 
     payload = {
         "contents": chat_history[user_id],
