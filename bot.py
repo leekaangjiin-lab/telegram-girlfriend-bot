@@ -23,7 +23,7 @@ def tanya_ai(user_id, user_text):
     chat_history[user_id] = chat_history[user_id][-12:]
 
     # PAKAI GEMINI-PRO - CONFIRM WUJUD
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={AI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={AI_API_KEY}"
 
     payload = {
         "contents": chat_history[user_id]
