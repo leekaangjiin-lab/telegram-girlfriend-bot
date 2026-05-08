@@ -29,7 +29,7 @@ def tanya_ai(user_id, user_text):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={AI_API_KEY}"
 
     payload = {
-        "contents": chat_history[us,
+        "contents": chat_history[user_id], # NI YANG SILAP TADI
         "systemInstruction": {
             "parts": [{"text": system_prompt}]
         }
