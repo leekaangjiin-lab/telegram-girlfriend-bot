@@ -3,6 +3,13 @@ import requests
 import os
 import time
 
+def list_model():
+    url = f"https://generativelanguage.googleapis.com/v1beta/models?key={AI_API_KEY}"
+    r = requests.get(url)
+    print("MODEL YANG KEY KAU BOLEH PAKAI:", r.text, flush=True)
+
+list_model()  # panggil sekali masa start
+
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 AI_API_KEY = os.environ.get('AI_API_KEY')
 bot = telebot.TeleBot(BOT_TOKEN)
